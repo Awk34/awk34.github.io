@@ -15,29 +15,79 @@
 <body>
 <div class="wrapper">
     <header>
-        <h1>Awk34.GitHub.io</h1>
+        <img src="assets/images/portrait_2014.jpg" />
 
-        <p></p>
+        <h1>Andrew Koroluk</h1>
 
-        <p class="view"><a href="https://github.com/Awk34">View My GitHub Profile</a></p>
+        <h2>Awk34</h2>
+
+        <h3 class="view"><a href="http://andrewkoroluk.com">View My Website</a></h3>
+        <h3 class="view"><a href="https://github.com/Awk34">View My GitHub Profile</a></h3>
     </header>
     <section>
         <h1>
-            <a id="designer-templates" class="anchor" href="http://andrewkoroluk.com" aria-hidden="true">
-                <span class="octicon octicon-link">
-                    Visit my website
-                </span>
-            </a>
+            <span class="octicon octicon-link">
+                My Repositories
+            </span>
         </h1>
+        <h3>Dynamically grabbed from the GitHub API</h3>
+        <div id="repo-section"></div>
     </section>
     <footer>
         <p>
-            <small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a>
-            </small>
+            <small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small>
         </p>
     </footer>
 </div>
 <script src="javascripts/scale.fix.js"></script>
+<script type="text/javascript">
+function getData(){
+    var url = "https://api.github.com/users/awk34/repos?callback=show"
+    var xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", url, false );
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
 
+var repoSectionElement = document.getElementById('repo-section');
+
+function addElement(name, description, link, fork) {
+    if(fork) return;
+
+    var containerElem = document.createElement('div');
+
+    var nameText = document.createTextNode(name);
+    var descText = document.createTextNode(description);
+
+    var headerElem = document.createElement('h1');
+    var anchorElem = document.createElement('a');
+    anchorElem.appendChild(nameText);
+    anchorElem.setAttribute('href', link);
+    headerElem.appendChild(anchorElem);
+
+    var descElem = document.createElement('p');
+    descElem.appendChild(descText);
+
+    containerElem.appendChild(headerElem);
+    containerElem.appendChild(descElem);
+
+    repoSectionElement.appendChild(containerElem);
+}
+
+var response = getData();
+
+/** Cut the preceding '\/**\/show' and trailing ')' */
+response = response.substring(9, response.length-2);
+
+response = JSON.parse(response);
+
+// console.log(response);
+
+for(var i=0; i<response.data.length; i++) {
+    var repo = response.data[i];
+    addElement(repo.name, repo.description, repo.html_url, repo.fork);
+}
+</script>
 </body>
 </html>
